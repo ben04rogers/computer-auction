@@ -2,13 +2,23 @@
 
 A website for auctioning computers.
 
-![techprowl2](https://user-images.githubusercontent.com/47819009/128790287-2839db50-b595-4f68-a7c2-9ccd8752d4bf.png)
+## Screenshots
 
+<table>
+  <tr>
+    <td><img src="screenshots/home.png" alt="Homepage" width="400"/></td>
+    <td><img src="screenshots/my_listings.png" alt="My Listings" width="400"/></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/watchlist.png" alt="Watchlist" width="400"/></td>
+    <td><img src="screenshots/listing_detail.png" alt="Listing Detail" width="400"/></td>
+  </tr>
+</table>
 
 ## Technologies Used
 - HTML
 - CSS
-- Bootstrap
+- Tailwind + Flowbite
 - Python
 - Flask
   - Flask Templates
