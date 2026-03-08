@@ -12,6 +12,16 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
+from pathlib import Path
+
+# Load .env file
+env_path = Path(__file__).parent.parent / ".env"
+if env_path.exists():
+    with open(env_path) as f:
+        for line in f:
+            if line.strip() and not line.startswith("#"):
+                key, value = line.strip().split("=", 1)
+                os.environ.setdefault(key, value)
 
 db = SQLAlchemy()
 
@@ -19,7 +29,9 @@ db = SQLAlchemy()
 def create_app():
     print(__name__)
     app = Flask(__name__)
-    app.secret_key = "iab207assesment3"
+    app.secret_key = os.environ.get("SECRET_KEY")
+    if not app.secret_key:
+        raise ValueError("No SECRET_KEY set - create a .env file")
 
     # Set app configuration data
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///auction.sqlite"

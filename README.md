@@ -31,17 +31,22 @@ git clone <repository-url>
 cd computer-auction
 ```
 
-2. Install dependencies:
+2. Copy the environment file:
+```bash
+cp .env.example .env
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run the application:
+4. Run the application:
 ```bash
 python main.py
 ```
 
-4. Open your browser and navigate to `http://localhost:5000`
+5. Open your browser and navigate to `http://localhost:5000`
 
 The database (`auction/auction.sqlite`) is included with seed data.
 
