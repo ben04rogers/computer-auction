@@ -34,7 +34,10 @@ def create_app():
         raise ValueError("No SECRET_KEY set - create a .env file")
 
     # Set app configuration data
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///auction.sqlite"
+    basedir = Path(__file__).parent.parent
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"sqlite:///{basedir / 'auction' / 'auction.sqlite'}"
+    )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
     db.init_app(app)
