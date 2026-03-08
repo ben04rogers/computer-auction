@@ -61,6 +61,8 @@ def create_app():
     # initialize the login manager
     login_manager = LoginManager()
     login_manager.login_view = "authentication.login"
+    login_manager.login_message = "Please log in to access this page."
+    login_manager.login_message_category = "danger"
     login_manager.init_app(app)
 
     from .models import User

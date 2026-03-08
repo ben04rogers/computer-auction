@@ -1,61 +1,64 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<main style="margin-top: 100px;">
-    <div class="container jumbotron mt-4 pt-3 pb-3" style>
-        <div class="row align-items-center">
-          <div class="col-md-8 text-center text-md-left">
-            <h1 class="responsive-heading">My Watch List <span class="text-muted">{{ watchlistcount }}</span></h1>
-            <p>Add auctions to your watch list to keep an eye on which listings you are interested in.</p>
-          </div>
-    
-          <div class="col-md-4">
-            <img class="img-fluid" src="{{url_for('static', filename='img/watchlist.svg')}}">
-          </div>
-        </div>
-    </div>
+<main class="max-w-screen-xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">My Watch List <span class="text-gray-500">{{ watchlistcount }}</span></h1>
+    <p class="text-gray-600 mt-2">Add auctions to your watch list to keep an eye on which listings you are interested in.</p>
+  </div>
 
-    <section>
-      <div class="container">
-        <div class="row mb-4">
-          {% for listing in watchlistlistings %}
+  <!-- Watch List Items -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {% for listing in watchlistlistings %}
+      {% for item in watchlistitems %}
+        {% if item.listing_id == listing.id %}
+        <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+          <a href="{{ url_for('listing.showlisting', id=listing.id) }}" class="block bg-gray-100" style="aspect-ratio: 4/3;">
+            <img src="{{ listing.image_url }}" class="w-full h-full object-cover" alt="{{ listing.title }}">
+          </a>
+          <div class="p-4">
+            <a href="{{ url_for('listing.showlisting', id=listing.id) }}" class="block">
+              <h5 class="text-lg font-semibold text-gray-900 mb-2">{{ listing.title }}</h5>
+            </a>
             
-            {% for item in watchlistitems %}
-              {% if item.listing_id == listing.id %}
-              <div class="col-md-6 col-lg-3">
-                <div class="card shadow-sm border-light mb-4 listing-card">
-                  <a href="{{url_for('listing.showlisting', id=listing.id)}}" class="position-relative">
-                    <img src="{{ listing.image_url }}" class="card-img-top" alt="image"> </a>
-                  <div class="card-body">
-                    <a href="{{url_for('listing.showlisting', id=listing.id)}}">
-                      <h5 class="font-weight-normal">{{ listing.title }}</h5>
-                    </a>
-                    <p class="d-block mb-2"><i class="fas fa-check-circle text-success"></i><span class="text-muted">
-                      Status:</span><strong> {{listing.status}}</strong></p>
-                    <div class="d-block">
-                      <span class="text-muted font-small d-block mb-2"><i
-                          class="fas fa-sort-numeric-up-alt orange-icon"></i> Total Bids:
-                        <strong>{{ listing.total_bids }}</strong></span>
-                    </div>
-                    <div class="d-block">
-                      <span class="text-muted font-small d-block mb-2"><i class="fas fa-tags orange-icon"></i> Current Bid:
-                        <strong>${{ listing.current_bid }}</strong></span>
-                    </div>
-                    <div class="d-block">
-                      <span class="text-muted font-small d-block mb-2"><i class="fas fa-clock text-warning"></i> Date Added:
-                        <strong>{{ item.date_added }}</strong></span>
-                    </div>
-                    <form class="d-inline" action="{{url_for('listing.remove_watchlist', listing=listing.id)}}" method="POST">
-                      <button class="btn btn-danger" type="submit"> Remove</button>
-                    </form>
-                  </div>
-                </div>
-              </div>
+            <div class="flex items-center mb-2">
+              {% if listing.status == 'Active' %}
+                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                <span class="text-gray-500 mr-2">Status:</span>
+                <span class="font-semibold text-green-600">{{ listing.status }}</span>
+              {% else %}
+                <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                <span class="text-gray-500 mr-2">Status:</span>
+                <span class="font-semibold text-red-600">{{ listing.status }}</span>
               {% endif %}
-            {% endfor %}
-          {% endfor %}
+            </div>
+            
+            <div class="flex items-center text-gray-500 text-sm mb-1">
+              <i class="fas fa-hashtag w-5 mr-1"></i>
+              <span>Total Bids: <strong>{{ listing.total_bids }}</strong></span>
+            </div>
+            
+            <div class="flex items-center text-gray-500 text-sm mb-1">
+              <i class="fas fa-tags text-orange-500 w-5 mr-1"></i>
+              <span>Current Bid: <strong>${{ listing.current_bid }}</strong></span>
+            </div>
+            
+            <div class="flex items-center text-gray-500 text-sm mb-4">
+              <i class="fas fa-clock text-yellow-500 w-5 mr-1"></i>
+              <span>Date Added: <strong>{{ item.date_added.strftime('%Y-%m-%d') }}</strong></span>
+            </div>
+            
+            <form action="{{ url_for('listing.remove_watchlist', listing=listing.id) }}" method="POST">
+              <button type="submit" class="text-gray-700 bg-gray-200 hover:bg-gray-300 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 w-full">
+                Remove
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-  </section>  
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
 </main>
 {% endblock %}

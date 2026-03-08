@@ -1,169 +1,204 @@
 {% extends 'base.html' %}
 
-{% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
-<main style="margin-top: 100px;">
-
-    <div class="container">
-      <h2 class="responsive-heading my-4 text-center text-lg-left">{{listing.title}}</h2>
-      <div class="row">
-        <div class="col-md-12 col-lg-6 mb-3">
-          <img class="img-fluid"
-            src="{{listing.image_url}}"
-            alt="Listing Image">
-        </div>
-
-        <div class="col-md-12 col-lg-6">
-
-          <div class="text-center text-lg-left">
-
-            <!-- Update status icon if auction closed --> 
-
-            {% if listing.status == 'Active' %}
-            <p class="d-block mb-4"><i class="fas fa-check-circle text-success"></i><span class="text-muted">
-                Status:</span><strong> {{listing.status}}</strong></p>
-            {% else %}
-            <p class="d-block mb-4"><i class="fas fa-times-circle text-danger"></i><span class="text-muted">
-                Status:</span><strong> {{listing.status}}</strong></p>
-            {% endif %}
-
-            <p class="d-block mb-4"><i class="fas fa-user blue-text"></i><span class="text-muted">
-                Seller:</span><strong> {{listing.seller}}</strong></p>
-
-            <!-- Update end date if auction closed --> 
-
-            {% if listing.status == 'Active' %}
-            <p class="d-block mb-4"><i class="fas fa-clock text-warning"></i><span class="text-muted">
-                End Date:</span><strong> {{listing.end_date}}</strong></p>
-            {% else %}
-            <p class="d-block mb-4"><i class="fas fa-clock text-warning"></i><span class="text-muted">
-              End Date:</span><strong> Already ended</strong></p>
-            {% endif %}
-
-            <p class="d-block mb-4"><i class="fas fa-shield-alt text-info"></i><span class="text-muted">
-                Condition:</span><strong> {{listing.condition}}</strong></p>
-            <p class="d-block mb-4"><i class="fas fa-sort-numeric-up-alt text-muted"></i><span class="text-muted"> Total
-                Bids:</span><strong> {{listing.total_bids}}</strong></p>
-            <p class="d-block mb-4"><i class="fas fa-tags orange-icon"></i><span class="text-muted"> Starting Bid:</span><strong> ${{listing.starting_bid}}</strong></p>
-            
-            <!-- Hide Watch list button if auction closed --> 
-
-            {% if listing.status == 'Active' %}
-            <form class="d-inline" action="{{url_for('listing.add_watchlist', listing=listing.id)}}" method="POST">
-              <button class="btn btn-blue" type="submit"><i class="fas fa-eye"></i> Watch List</button>
-            </form>
-            {% endif %}
-          </div>
-
-          {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-          <!-- check if there are any messages -->
-          <div class="row mt-3 mb-3">
-            <div class="col-md-12">
-              {% for category, message in messages %}
-              <!--loop through the messages-->
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-              <!--display as alert-->
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-          {% endwith %}
-
-          <div class="row border py-3 shadow mt-3">
-            <!-- Left Side -->
-            <div class="col-lg-3 text-center">
-              {% if listing.total_bids > 0 %}
-              <p>Current Bid</p>
-              {% else %}
-              <p>Starting Bid</p>
-              {% endif %}
-              <h4 class="orange-icon">${{listing.current_bid}}</h4>
-            </div>
-
-            <!-- Right Side -->
-            <form action="{{ url_for('listing.placebid', listing=listing.id)}}" method="POST" role="form" class="col-lg-9 d-flex align-items-center justify-content-center border-left">
-              {{ bidform.csrf_token() }}
-              {% if listing.status == 'Active' %}
-              <div class="input-group justify-content-center pt-3">
-                {{ wtf.form_field(bidform.bid_amount, class='bid-input', placeholder='Bid amount...') }}
-                <div class="input-group-append">
-                  {{wtf.form_field(bidform.submit, class="btn btn-blue bid-btn")}}
-                </div>
-              </div>
-              {% else %}
-              <p><em>This auction is closed</em></p>
-              {% endif %}
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div class="row my-3">
-        <div class="reviews-box col-md-12 pr-0">
-          <div class="card text-center">
-
-            <div class="card-header">
-              <ul class="nav nav-tabs card-header-tabs">
-                <li class="nav-item">
-                  <a href="#itemdescription" class="nav-link active" role="tab" data-toggle="tab">Description</a>
-                </li>
-                <li class="nav-item">
-                  <a href="#itemdetails" class="nav-link" role="tab" data-toggle="tab">Item Details</a>
-                </li>
-                <li class="nav-item">
-                  <a href="#reviews" class="nav-link" role="tab" data-toggle="tab">Reviews</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#reviewsModal" data-toggle="modal" data-target="#reviewsModal">Post Review</a>
-                </li>
-              </ul>
-            </div>
-
-            <div class="tab-content">
-              <div role="tabpanel1" class="card-body tab-pane text-left active" id="itemdescription">
-                <p>{{listing.description}}</p>
-              </div>
-                
-              <div role="tabpanel1" class="card-body tab-pane text-left" id="itemdetails">
-                <p>{{listing.cpu}} processor</p>
-                <p>{{listing.ram_gb}} RAM</p>
-                <p>{{listing.storage_gb}} storage</p>
-              </div>
+<main class="max-w-screen-xl mx-auto px-4 py-8">
+  <h2 class="text-3xl font-bold text-gray-900 mb-8">{{ listing.title }}</h2>
   
-              <div role="tabpanel1" class="card-body tab-pane text-left" id="reviews">
-                {% for review in listing.reviews %}
-                <div class="mb-4 border-bottom">
-                  <b>{{review.user.name}}<span class="ml-2 text-muted">{{review.created_at}}</span></b>  
-                  <h5 class="review-title mt-2">{{review.title}}</h5>
-                  <p class="review-description">{{review.feedback}}</p>
-                </div>
-                {% endfor %}
-              </div>
-            </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Image -->
+    <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden bg-gray-100">
+      <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="w-full h-full object-cover">
+    </div>
 
+    <!-- Details -->
+    <div>
+      <!-- Status -->
+      <div class="flex items-center mb-4">
+        {% if listing.status == 'Active' %}
+          <i class="fas fa-check-circle text-green-500 mr-2"></i>
+          <span class="text-gray-500 mr-2">Status:</span>
+          <span class="font-semibold text-green-600">{{ listing.status }}</span>
+        {% else %}
+          <i class="fas fa-times-circle text-red-500 mr-2"></i>
+          <span class="text-gray-500 mr-2">Status:</span>
+          <span class="font-semibold text-red-600">{{ listing.status }}</span>
+        {% endif %}
+      </div>
 
-            <!--Modal for posting reviews-->
-            <div class="modal fade" id="reviewsModal" tabindex="-1" role="dialog"
-              aria-labelledby="reviewModal aria-hidden=" true>
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title">Leave a review</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body text-left">
-                    {{wtf.quick_form(form, "/listings/{0}/review".format(listing.id))}}
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div class="space-y-3 mb-6">
+        <div class="flex items-center">
+          <i class="fas fa-user text-blue-500 w-6"></i>
+          <span class="text-gray-500 mr-2">Seller:</span>
+          <span class="font-semibold">{{ listing.seller }}</span>
+        </div>
+
+        <div class="flex items-center">
+          <i class="fas fa-clock text-yellow-500 w-6"></i>
+          <span class="text-gray-500 mr-2">End Date:</span>
+          <span class="font-semibold">
+            {% if listing.status == 'Active' %}
+              {{ listing.end_date }}
+            {% else %}
+              Already ended
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="flex items-center">
+          <i class="fas fa-shield-alt text-cyan-500 w-6"></i>
+          <span class="text-gray-500 mr-2">Condition:</span>
+          <span class="font-semibold">{{ listing.condition }}</span>
+        </div>
+
+        <div class="flex items-center">
+          <i class="fas fa-hashtag text-gray-500 w-6"></i>
+          <span class="text-gray-500 mr-2">Total Bids:</span>
+          <span class="font-semibold">{{ listing.total_bids }}</span>
+        </div>
+
+        <div class="flex items-center">
+          <i class="fas fa-tags text-orange-500 w-6"></i>
+          <span class="text-gray-500 mr-2">Starting Bid:</span>
+          <span class="font-semibold">${{ listing.starting_bid }}</span>
+        </div>
+      </div>
+
+      <!-- Watch List Button -->
+      {% if listing.status == 'Active' %}
+      <form action="{{ url_for('listing.add_watchlist', listing=listing.id) }}" method="POST" class="mb-6">
+        <button type="submit" class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
+          <i class="fas fa-eye mr-2"></i>Watch List
+        </button>
+      </form>
+      {% endif %}
+
+      <!-- Bid Section -->
+      <div class="bg-white rounded-lg shadow border border-gray-200 p-6">
+        {% if listing.total_bids > 0 %}
+          <p class="text-gray-500 text-sm mb-1">Current Bid</p>
+        {% else %}
+          <p class="text-gray-500 text-sm mb-1">Starting Bid</p>
+        {% endif %}
+        <h4 class="text-3xl font-bold text-gray-900 mb-4">${{ listing.current_bid }}</h4>
+
+        {% if listing.status == 'Active' %}
+        <form action="{{ url_for('listing.placebid', listing=listing.id) }}" method="POST">
+          {{ bidform.csrf_token() }}
+          <div class="flex gap-2">
+            <input type="text" name="bid_amount" placeholder="Bid amount..." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2" required>
+            <button type="submit" class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-2 whitespace-nowrap">
+              Place Bid
+            </button>
           </div>
+        </form>
+        {% else %}
+        <p class="text-gray-500"><em>This auction is closed</em></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="mb-6">
+    <ul class="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200">
+      <li class="mr-2">
+        <button id="description-tab" onclick="switchTab('description')" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 tab-btn active">Description</button>
+      </li>
+      <li class="mr-2">
+        <button id="details-tab" onclick="switchTab('details')" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 tab-btn">Item Details</button>
+      </li>
+      <li class="mr-2">
+        <button id="reviews-tab" onclick="switchTab('reviews')" class="inline-block p-4 rounded-t-lg border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 tab-btn">Reviews</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="bg-white rounded-lg shadow border border-gray-200 p-6">
+    <!-- Description Tab -->
+    <div id="description" class="tab-pane">
+      <p class="text-gray-700">{{ listing.description }}</p>
+    </div>
+
+    <!-- Item Details Tab -->
+    <div id="details" class="tab-pane hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gray-50 rounded-lg p-4 text-center">
+          <p class="text-gray-500 text-sm">CPU</p>
+          <p class="font-semibold">{{ listing.cpu }}</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center">
+          <p class="text-gray-500 text-sm">RAM</p>
+          <p class="font-semibold">{{ listing.ram_gb }}</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 text-center">
+          <p class="text-gray-500 text-sm">Storage</p>
+          <p class="font-semibold">{{ listing.storage_gb }}</p>
         </div>
       </div>
     </div>
+
+    <!-- Reviews Tab -->
+    <div id="reviews" class="tab-pane hidden">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Post a Review</h3>
+      <form method="POST" action="{{ url_for('listing.review', listing=listing.id) }}" class="space-y-4 mb-6">
+        {{ form.csrf_token }}
+        
+        <div>
+          <label for="title" class="block mb-2 text-sm font-medium text-gray-900">Title</label>
+          <input type="text" name="title" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="Example: Great Features!" required>
+        </div>
+
+        <div>
+          <label for="feedback" class="block mb-2 text-sm font-medium text-gray-900">Review</label>
+          <textarea name="feedback" id="feedback" rows="4" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" placeholder="Example: I bought this laptop a month ago..." required></textarea>
+        </div>
+
+        <button type="submit" class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
+          Post Review
+        </button>
+      </form>
+
+      <hr class="my-6">
+
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Reviews</h3>
+      {% for review in listing.reviews %}
+      <div class="mb-4 border-b pb-4 last:border-0">
+        <div class="flex items-center mb-2">
+          <span class="font-semibold">{{ review.user.name }}</span>
+          <span class="text-gray-500 ml-2 text-sm">{{ review.created_at }}</span>
+        </div>
+        <h5 class="font-semibold text-gray-900 mb-1">{{ review.title }}</h5>
+        <p class="text-gray-700">{{ review.feedback }}</p>
+      </div>
+      {% endfor %}
+      {% if not listing.reviews %}
+      <p class="text-gray-500">No reviews yet.</p>
+      {% endif %}
     </div>
-  </main>
+  </div>
+
+  <script>
+    function switchTab(tabId) {
+      // Hide all tab panes
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));
+      // Show selected tab pane
+      document.getElementById(tabId).classList.remove('hidden');
+      
+      // Update tab button styles
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-primary', 'text-blue-600');
+        btn.classList.add('border-transparent');
+      });
+      document.getElementById(tabId + '-tab').classList.remove('border-transparent');
+      document.getElementById(tabId + '-tab').classList.add('border-primary', 'text-blue-600');
+    }
+
+    // Check for tab query parameter on page load
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    if (tabParam) {
+      switchTab(tabParam);
+    }
+  </script>
+</main>
 {% endblock %}

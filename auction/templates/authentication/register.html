@@ -1,34 +1,59 @@
 {% extends 'base.html' %}
 
-{% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
-<div class="container">
-  <div class="row align-items-center">
-    <div class="col-md-6">
-      <h2>{{heading}}</h2>
+<div class="min-h-[calc(100vh-200px)] flex items-center justify-center mt-24 mb-12">
+  <div class="w-full max-w-md">
+    <div class="bg-white rounded-lg shadow p-8">
+      <h2 class="text-2xl font-bold text-center text-gray-900 mb-6">{{ heading }}</h2>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-
-      <!-- check if there are any messages -->
-      <div class="row mt-3 mb-3">
-        <div class="col-md-12">
+        {% if messages %}
           {% for category, message in messages %}
-          <!--loop through the messages-->
-          <div class="alert alert-{{category}}">{{ message }}</div>
-          <!--display as alert-->
+            <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}" role="alert">
+              {{ message }}
+            </div>
           {% endfor %}
-        </div>
-      </div>
-      {% endif %}
+        {% endif %}
       {% endwith %}
 
-      {{wtf.quick_form(form)}}
-    </div>
-    <div class="col-md-6">
-      <img class="img-fluid" src="{{ url_for('static', filename='/img/register.svg')}}">
+      <form method="POST" class="space-y-6">
+        {{ form.hidden_tag() }}
+        
+        <div>
+          <label for="user_name" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+          <input type="text" name="user_name" id="user_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
+        </div>
+
+        <div>
+          <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Email</label>
+          <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
+        </div>
+
+        <div>
+          <label for="contact_num" class="block mb-2 text-sm font-medium text-gray-900">Contact Number</label>
+          <input type="text" name="contact_num" id="contact_num" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
+        </div>
+
+        <div>
+          <label for="address" class="block mb-2 text-sm font-medium text-gray-900">Address</label>
+          <input type="text" name="address" id="address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
+        </div>
+
+        <div>
+          <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
+          <input type="password" name="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
+        </div>
+
+        <div>
+          <label for="confirm" class="block mb-2 text-sm font-medium text-gray-900">Confirm Password</label>
+          <input type="password" name="confirm" id="confirm" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5" required>
+        </div>
+
+        <button type="submit" class="w-full text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+          {{ heading }}
+        </button>
+      </form>
     </div>
   </div>
-
 </div>
 {% endblock %}

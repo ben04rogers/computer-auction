@@ -1,100 +1,62 @@
 {% extends 'base.html' %}
 
-{% block header %}
-<div class="container jumbotron mt-4" style>
-  <div class="row align-items-center">
-    <div class="col-md-7 text-center text-md-left">
-      <h1>Auction your used computers</h1>
-      <p>Techprowl hosts auctions for a range of different brands of computers, both desktops and laptops from all
-        around Australia.</p>
-      <a class="btn btn-blue btn-lg" href="{{url_for('listing.createlisting')}}" role="button">Create Listing</a>
-    </div>
-
-    <div class="col-md-5">
-      <img class="img-fluid" src="{{url_for('static', filename='img/shopphoto.svg')}}">
-    </div>
-  </div>
-</div>
-{% endblock %}
-
 {% block content %}
-<main>
-  <!-- Available Auctions -->
-  <div class="container text-center">
-    <h2 class="responsive-heading">🔥 Hot Auctions Right Now 🔥</h2>
+<div class="max-w-screen-xl mx-auto px-4 py-8">
+  <!-- Hot Auctions Header -->
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-900">Hot Auctions Right Now</h2>
   </div>
 
-  <!--Search bar-->
-  <div class="container text-center ">
-    <div class="row justify-content-center mt-3 pb-4">
-      <div class="col-10 col-lg-7 col-xl-6">
-        <form class="form-inline d-flex flex-nowrap input-group" action="{{url_for('main.search')}}" >
-            <input type="text" name="search" class="form-control flex-grow-1 my-1" placeholder="Search for computers" id="inlineFormCustomSelectPref">
-            <div class="input-group-append">
-              <button type="submit" class="flex-shrink-1 btn btn-primary my-1">Search</button>
-            </div>
-        </form>
-      </div>
-    </div> 
+  <!-- Search Bar -->
+  <div class="mb-8">
+    <form action="{{ url_for('main.search') }}" class="w-full max-w-lg flex">
+      <input type="text" name="search" class="flex-grow bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-primary-500 focus:border-primary-500 p-2" placeholder="Search for computers">
+      <button type="submit" class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-r-lg px-6 py-2">Search</button>
+    </form>
   </div>
-  
-  
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  <!-- check if there are any messages -->
-  <div class="container">
-    <div class="row mt-3 mb-4">
-      <div class="col-md-3">
-        {% for category, message in messages %}
-        <!--loop through the messages-->
-        <div class="text-muted ">{{ message }}</div>
-        <!--display as alert-->
-        {% endfor %}
-      </div>
-    </div>
+  <!-- Search Results Message -->
+  {% if search_result %}
+  <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+    <p class="text-gray-900 text-lg font-semibold">{{ search_result }}</p>
   </div>
   {% endif %}
-  {% endwith %}
 
-  <!-- First Row -->
-  <section>
-    <div class="container">
-      <div class="row mb-4">
-          {% for listing in listings %}
-          <div class="col-md-6 col-lg-3">
-            <div class="card shadow-sm border-light mb-4 listing-card">
-              <a href="{{url_for('listing.showlisting', id=listing.id)}}" class="position-relative">
-                <img src="{{ listing.image_url }}" class="card-img-top" alt="image"> </a>
-              <div class="card-body">
-                <a href="{{url_for('listing.showlisting', id=listing.id)}}">
-                  <h5 class="font-weight-normal">{{ listing.title }}</h5>
-                </a>
-
-                <div class="d-block">
-                  <span class="text-muted font-small d-block mb-2"><i
-                      class="fas fa-sort-numeric-up-alt orange-icon"></i> Total Bids:
-                    <strong>{{ listing.total_bids }}</strong></span>
-                </div>
-
-                <div class="d-block">
-                  <span class="text-muted font-small d-block mb-2"><i class="fas fa-tags orange-icon"></i> Current Bid:
-                    <strong>${{ listing.current_bid }}</strong></span>
-                </div>
-
-                <div class="d-block">
-                  <span class="text-muted font-small d-block mb-2"><i class="fas fa-user orange-icon"></i> Seller:
-                    <strong>{{ listing.seller }}</strong></span>
-                </div>
-
-                <form action="{{url_for('listing.add_watchlist', listing=listing.id)}}" method="POST">
-                  <button class="btn btn-blue btn-block" href="" type="submit"><i class="fas fa-eye"></i> Watch List</button>
-                </form>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
+  <!-- Listings Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {% for listing in listings %}
+    <div class="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+      <a href="{{ url_for('listing.showlisting', id=listing.id) }}" class="block bg-gray-100" style="aspect-ratio: 4/3;">
+        <img src="{{ listing.image_url }}" class="w-full h-full object-cover" alt="{{ listing.title }}">
+      </a>
+      <div class="p-4">
+        <a href="{{ url_for('listing.showlisting', id=listing.id) }}" class="block">
+          <h5 class="text-lg font-semibold text-gray-900 mb-2">{{ listing.title }}</h5>
+        </a>
+        
+        <div class="flex items-center text-gray-500 text-sm mb-1">
+          <i class="fas fa-hashtag mr-2"></i>
+          <span>Total Bids: <strong>{{ listing.total_bids }}</strong></span>
+        </div>
+        
+        <div class="flex items-center text-gray-500 text-sm mb-1">
+          <i class="fas fa-tags mr-2"></i>
+          <span>Current Bid: <strong>${{ listing.current_bid }}</strong></span>
+        </div>
+        
+        <div class="flex items-center text-gray-500 text-sm mb-4">
+          <i class="fas fa-user mr-2"></i>
+          <span>Seller: <strong>{{ listing.seller }}</strong></span>
+        </div>
+        
+        <form action="{{ url_for('listing.add_watchlist', listing=listing.id) }}" method="POST">
+          <button type="submit" class="w-full text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
+            <i class="fas fa-eye mr-2"></i>Watch List
+          </button>
+        </form>
       </div>
-  </section>
-</main>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}
