@@ -1,6 +1,6 @@
 # Computer Auction Website
 
-A CRUD website for auctioning computers. View at https://iab207-assessment-3.herokuapp.com/
+A website for auctioning computers.
 
 ![techprowl2](https://user-images.githubusercontent.com/47819009/128790287-2839db50-b595-4f68-a7c2-9ccd8752d4bf.png)
 
@@ -16,24 +16,80 @@ A CRUD website for auctioning computers. View at https://iab207-assessment-3.her
   - Flask SQLAlchemy
   - Flask Login
 
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- pip
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd computer-auction
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Run the application:
+```bash
+python main.py
+```
+
+4. Open your browser and navigate to `http://localhost:5000`
+
+The database (`auction/auction.sqlite`) is included with seed data.
+
 ## Features
-- Landing page with recently posted items
-- Items on landing page contain the following
-  - The number of bids on an item
-  - The status of a listing - closed or open for bid
-  - The highest bid
-- Users can check details of closed bids
-- Users are able to select item listing and view the details of it.
-- If the auction is not yet closed, the user can bit on the item by providing an amount greater than the current highest bid. 
-- Users can add an item to their watchlist (if the listing is closed then this is not possible)
-- Users can view items in their watchlist with details of item
-- Users can register
-- Users can login
-- Users can list items once they are registered
-- Users can logout
-- Users can search by keyword
-- Users can post reviews for listings
-- Responsive layout 
-- Page not found error is displayed for internal server errors and navigates user back to home page
+
+### User Authentication
+- User registration with email validation
+- Secure login/logout
+- Session management
+
+### Listings
+- Create new auction listings with title, description, starting price, and images
+- View all active listings on the homepage
+- View listing details including bid history
+- See listing status (Active/Closed)
+
+### Bidding
+- Place bids on active listings
+- Bid must be higher than current highest bid
+- View bid history for each listing
+- Automatic auction closure based on end date
+
+### Watchlist
+- Add/remove listings from personal watchlist
+- View all watched items in one place
+
+### Additional
+- Search listings by keyword
+- Post reviews on listings
+- Responsive design for mobile and desktop
+- Custom error pages (404, 500)
 - Form validation
-- Data is dynamically created and stored in SQLite database
+
+## Project Structure
+
+```
+computer-auction/
+├── auction/
+│   ├── __init__.py          # Flask app factory
+│   ├── auth.py              # Authentication routes
+│   ├── forms.py             # WTForms definitions
+│   ├── listings.py          # Listing/bid/watchlist logic
+│   ├── models.py            # Database models
+│   ├── views.py             # Main routes
+│   ├── auction.sqlite      # SQLite database
+│   ├── static/              # CSS, images
+│   └── templates/           # Jinja2 templates
+├── main.py                  # Application entry point
+├── requirements.txt         # Python dependencies
+└── README.md
+```
