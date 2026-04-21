@@ -35,14 +35,22 @@
         <img src="{{ listing.image_url }}" class="w-full h-full object-cover" alt="{{ listing.title }}">
       </a>
       {% if current_user.is_authenticated %}
-      <div class="absolute top-2 right-2">
-        <button 
-          type="button" 
-          class="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100 watchlist-btn {% if listing.id in watchlist_ids %}in-watchlist text-red-500{% else %}text-gray-400{% endif %}"
-          data-listing-id="{{ listing.id }}"
-          data-in-watchlist="{% if listing.id in watchlist_ids %}true{% else %}false{% endif %}"
+      <div class="absolute top-2 right-2" 
+           x-data="{ 
+             inWatchlist: {{ 'true' if listing.id in watchlist_ids else 'false' }},
+             async toggle() {
+               const res = await fetch(`/listings/${this.$el.dataset.listingId}/watchlist/toggle`, { method: 'POST' });
+               const data = await res.json();
+               if (data.success) this.inWatchlist = data.in_watchlist;
+             }
+           }"
+           data-listing-id="{{ listing.id }}"
+           @click="toggle()">
+        <button type="button" 
+          class="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
+          :class="inWatchlist ? 'text-red-500' : 'text-gray-400'"
         >
-          <i class="{% if listing.id in watchlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+          <i class="fa-heart" :class="inWatchlist ? 'fas' : 'far'"></i>
         </button>
       </div>
       {% endif %}
@@ -70,40 +78,4 @@
     {% endfor %}
   </div>
 </div>
-
-<script>
-document.querySelectorAll('.watchlist-btn').forEach(btn => {
-  btn.addEventListener('click', async function() {
-    const listingId = this.dataset.listingId;
-    const icon = this.querySelector('i');
-    
-    try {
-      const response = await fetch(`/listings/${listingId}/watchlist/toggle`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      const data = await response.json();
-      
-      if (data.success) {
-        if (data.in_watchlist) {
-          this.classList.add('in-watchlist', 'text-red-500');
-          this.classList.remove('text-gray-400');
-          icon.classList.remove('far');
-          icon.classList.add('fas');
-        } else {
-          this.classList.remove('in-watchlist', 'text-red-500');
-          this.classList.add('text-gray-400');
-          icon.classList.remove('fas');
-          icon.classList.add('far');
-        }
-        this.dataset.inWatchlist = data.inWatchlist;
-      }
-    } catch (error) {
-      console.error('Error toggling watchlist:', error);
-    }
-  });
-});
-</script>
 {% endblock %}
