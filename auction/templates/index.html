@@ -22,8 +22,11 @@
 
   <!-- Search Results Message -->
   {% if search_result %}
-  <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+  <div class="mb-6 flex items-center justify-between p-4 bg-blue-50 rounded-lg">
     <p class="text-gray-900 text-lg font-semibold">{{ search_result }}</p>
+    <a href="{{ url_for('main.index') }}" class="text-gray-600 hover:text-gray-900">
+      Clear Search <span class="ml-1">✕</span>
+    </a>
   </div>
   {% endif %}
 
