@@ -170,6 +170,34 @@ def add_watchlist(listing):
     return redirect(url_for("listing.showlisting", id=listing))
 
 
+@listingbp.route("<listing>/watchlist/toggle", methods=["POST"])
+@login_required
+def toggle_watchlist(listing):
+    from flask import jsonify
+
+    item = Listing.query.filter_by(id=listing).first()
+    if not item:
+        return jsonify({"success": False, "error": "Listing not found"})
+
+    existing = WatchListItem.query.filter_by(
+        listing_id=item.id, user_id=current_user.id
+    ).first()
+
+    if existing:
+        db.session.delete(existing)
+        db.session.commit()
+        return jsonify({"success": True, "in_watchlist": False})
+    else:
+        if current_user.name == item.seller:
+            return jsonify({"success": False, "error": "Cannot add your own listing"})
+        watchlist_item = WatchListItem(
+            listing_id=item.id, user_id=current_user.id, date_added=datetime.now()
+        )
+        db.session.add(watchlist_item)
+        db.session.commit()
+        return jsonify({"success": True, "in_watchlist": True})
+
+
 @listingbp.route("/watchlist", methods=["GET", "POST"])
 @login_required
 def watchlist():

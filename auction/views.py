@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from .models import Listing
+from flask_login import current_user
+from .models import Listing, WatchListItem
 from sqlalchemy import or_
 
 # Create main blueprint
@@ -9,7 +10,11 @@ mainbp = Blueprint("main", __name__)
 @mainbp.route("/")
 def index():
     listings = Listing.query.filter_by(status="Active").all()
-    return render_template("index.html", listings=listings)
+    watchlist_ids = []
+    if current_user.is_authenticated:
+        watchlist_items = WatchListItem.query.filter_by(user_id=current_user.id).all()
+        watchlist_ids = [item.listing_id for item in watchlist_items]
+    return render_template("index.html", listings=listings, watchlist_ids=watchlist_ids)
 
 
 @mainbp.route("/search")
