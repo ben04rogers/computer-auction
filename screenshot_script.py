@@ -27,7 +27,7 @@ OUTPUT_DIR = "screenshots"
 # Create output directory
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Pages to screenshot
+# Pages to screenshot (unauthenticated)
 pages = [
     ("/", "home"),
 ]
@@ -38,7 +38,6 @@ def take_screenshot(page, url, name):
     full_url = BASE_URL + url if url != "/" else BASE_URL
     try:
         page.goto(full_url, wait_until="networkidle", timeout=10000)
-        # Capture only viewport (not full page), same size for all
         page.screenshot(path=f"{OUTPUT_DIR}/{name}.png")
         print(f"Saved: {OUTPUT_DIR}/{name}.png")
     except Exception as e:
@@ -48,14 +47,12 @@ def take_screenshot(page, url, name):
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        # Fixed viewport size for all screenshots
         context = browser.new_context(viewport={"width": 1280, "height": 900})
         page = context.new_page()
 
         for url, name in pages:
             take_screenshot(page, url, name)
 
-        # Now test authenticated pages
         # Login first
         print("Logging in...")
         page.goto(BASE_URL + "/authentication/login")
@@ -64,17 +61,24 @@ def main():
         page.click('button[type="submit"]')
         page.wait_for_timeout(1000)
 
-        # Watchlist already has items from database
-        print("Watchlist already populated")
-
+        # Authenticated pages
         authenticated_pages = [
+            ("/listings/create", "create_listing"),
             ("/listings/mylistings", "my_listings"),
             ("/listings/watchlist", "watchlist"),
-            ("/listings/1", "listing_detail"),
+            ("/listings/2", "listing_detail"),
         ]
 
         for url, name in authenticated_pages:
             take_screenshot(page, url, name)
+
+        # Screenshot with reviews section visible - scroll down to it
+        print("Taking screenshot of reviews section...")
+        page.goto(BASE_URL + "/listings/2?tab=reviews", wait_until="networkidle")
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight * 0.7)")
+        page.wait_for_timeout(500)
+        page.screenshot(path=f"{OUTPUT_DIR}/listing_reviews.png")
+        print(f"Saved: {OUTPUT_DIR}/listing_reviews.png")
 
         browser.close()
 

@@ -39,15 +39,7 @@
       </a>
       {% if current_user.is_authenticated %}
       <div class="absolute top-2 right-2" 
-           x-data="{ 
-             inWatchlist: {{ 'true' if listing.id in watchlist_ids else 'false' }},
-             async toggle() {
-               const res = await fetch(`/listings/${this.$el.dataset.listingId}/watchlist/toggle`, { method: 'POST' });
-               const data = await res.json();
-               if (data.success) this.inWatchlist = data.in_watchlist;
-             }
-           }"
-           data-listing-id="{{ listing.id }}"
+           x-data="watchlistBtn('{{ listing.id }}', {{ 'true' if listing.id in watchlist_ids else 'false' }})"
            @click="toggle()">
         <button type="button" 
           class="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md hover:bg-gray-100 transition-colors"
@@ -72,7 +64,7 @@
           <span>Current Bid: <strong>${{ listing.current_bid }}</strong></span>
         </div>
         
-        <div class="flex items-center text-gray-500 text-sm mb-4">
+        <div class="flex items-center text-gray-500 text-sm">
           <i class="fas fa-user mr-2"></i>
           <span>Seller: <strong>{{ listing.seller }}</strong></span>
         </div>
@@ -81,4 +73,25 @@
     {% endfor %}
   </div>
 </div>
+
+<script>
+function watchlistBtn(listingId, inWatchlist) {
+  return {
+    inWatchlist: inWatchlist,
+    async toggle() {
+      const res = await fetch('/listings/' + listingId + '/watchlist/toggle', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        this.inWatchlist = data.in_watchlist;
+      } else if (data.error) {
+        const toast = document.createElement('div');
+        toast.className = 'flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow border-l-4 border-red-500';
+        toast.innerHTML = '<div class="text-sm font-normal">' + data.error + '</div>';
+        document.getElementById('toast-container').appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+      }
+    }
+  };
+}
+</script>
 {% endblock %}

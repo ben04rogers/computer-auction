@@ -64,12 +64,16 @@
       </div>
 
       <!-- Watch List Button -->
-      {% if listing.status == 'Active' %}
-      <form action="{{ url_for('listing.add_watchlist', listing=listing.id) }}" method="POST" class="mb-6">
-        <button type="submit" class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
-          <i class="fas fa-eye mr-2"></i>Watch List
+      {% if listing.status == 'Active' and current_user.is_authenticated %}
+      <div class="mb-6" x-data="watchlistBtn('{{ listing.id }}', {{ 'true' if in_watchlist else 'false' }})">
+        <button type="button" @click="toggle()" 
+          class="text-white bg-primary hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+          :class="inWatchlist ? 'bg-red-600 hover:bg-red-700' : ''"
+        >
+          <i class="fa-heart mr-2" :class="inWatchlist ? 'fas' : 'far'"></i>
+          <span x-text="inWatchlist ? 'In Watchlist' : 'Add to Watchlist'"></span>
         </button>
-      </form>
+      </div>
       {% endif %}
 
       <!-- Bid Section -->
@@ -178,6 +182,25 @@
   </div>
 
   <script>
+    function watchlistBtn(listingId, inWatchlist) {
+      return {
+        inWatchlist: inWatchlist,
+        async toggle() {
+          const res = await fetch('/listings/' + listingId + '/watchlist/toggle', { method: 'POST' });
+          const data = await res.json();
+          if (data.success) {
+            this.inWatchlist = data.in_watchlist;
+          } else if (data.error) {
+            const toast = document.createElement('div');
+            toast.className = 'flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow border-l-4 border-red-500';
+            toast.innerHTML = '<div class="text-sm font-normal">' + data.error + '</div>';
+            document.getElementById('toast-container').appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+          }
+        }
+      };
+    }
+
     function switchTab(tabId) {
       // Hide all tab panes
       document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.add('hidden'));

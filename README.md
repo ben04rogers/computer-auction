@@ -6,12 +6,16 @@ A website for auctioning computers.
 
 <table>
   <tr>
-    <td><img src="screenshots/home.png" alt="Homepage" width="400"/></td>
-    <td><img src="screenshots/my_listings.png" alt="My Listings" width="400"/></td>
+    <td><img src="screenshots/home.png" alt="Homepage" width="400"/><br><center>Homepage</center></td>
+    <td><img src="screenshots/my_listings.png" alt="My Listings" width="400"/><br><center>My Listings</center></td>
   </tr>
   <tr>
-    <td><img src="screenshots/watchlist.png" alt="Watchlist" width="400"/></td>
-    <td><img src="screenshots/listing_detail.png" alt="Listing Detail" width="400"/></td>
+    <td><img src="screenshots/watchlist.png" alt="Watchlist" width="400"/><br><center>Watchlist</center></td>
+    <td><img src="screenshots/listing_detail.png" alt="Listing Detail" width="400"/><br><center>Listing Detail</center></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/create_listing.png" alt="Create Listing" width="400"/><br><center>Create Listing</center></td>
+    <td><img src="screenshots/listing_reviews.png" alt="Listing Reviews" width="400"/><br><center>Listing Reviews</center></td>
   </tr>
 </table>
 
@@ -59,6 +63,18 @@ python main.py
 5. Open your browser and navigate to `http://localhost:5000`
 
 The database (`auction/auction.sqlite`) is included with seed data.
+
+To re-seed the database:
+```bash
+python seed_db.py
+```
+
+To update screenshots:
+```bash
+pip install playwright
+playwright install chromium
+python screenshot_script.py
+```
 
 ## Features
 
